@@ -4,18 +4,7 @@
 
 #include "radioEmulator.h"
 
-//DigitalOut led1(LED1);
-bool led2;
-//DigitalOut led3(LED3);
-//DigitalOut led4(LED4);
-//DigitalOut reverse(p15);
-
 #undef CHECK_HW_SHUTDOWN
-
-//LocalFileSystem local("local");
-//#include "SDFileSystem.h"
-
-//SDFileSystem sd(p5, p6, p7, p8, "sd"); // the pinout on the mbed Cool Components workshop board
 
 char RadioEmulator::unlock[6] = {0x03,0x02,0x00,0x40,0x87,0xa5};
 char RadioEmulator::lock[6] =   {0x01, 0x02, 0x00, 0x40, 0x87, 0xa5};
@@ -24,13 +13,9 @@ char RadioEmulator::trunk[6] =  {0x05, 0x02, 0x00, 0x40, 0x87, 0xa5};
 RadioEmulator::RadioEmulator(CANClass *can, bool wdTO)
 {
     //printf("RadioEmulator Initializing\r\n");
-    led2 = false;
     //HostSock = new UDPSock(new Host(IpAddr(), 50000, NULL), 64, this);
 
     CANDevice = can;
-    //can_RS_Pin = rs;
-    //can_IRQ_Pin = irq;
-
     prevSWC = 0;
     
     memset(&status, 0, sizeof(status));  
@@ -167,12 +152,6 @@ void RadioEmulator::Operate()
     if (CANBusTicker->check())
     {
         //writeCANFlag = false;
-        //Flip LED state
-        led2 = !led2;
-        if(led2)
-        	digitalWrite(13, HIGH);
-        else
-        	digitalWrite(13, LOW);
         //SendOnMsg();
         SendRadioModeMsg();
         SendEVICMsg();
