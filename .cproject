@@ -27,6 +27,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SparkFun_Si4703_Arduino_Library/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.204140070" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
@@ -40,6 +43,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SparkFun_Si4703_Arduino_Library/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.1923728926" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
@@ -52,7 +58,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Libraries/*/?xamples" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+						<entry excluding="Hardware_Documentation|Libraries/*/?xamples" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -66,6 +72,10 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/Dodge_CAN_USB_Interface_Teensy31"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
