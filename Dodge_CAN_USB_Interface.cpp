@@ -1,25 +1,27 @@
 /* Pins used in this project
- * 0 - Serial1 RX Broken out
- * 1 - Serial1 TX Broken out
+ * 0 - Serial1 RX Broken out on Header
+ * 1 - Serial1 TX Broken out on Header
  * 2 -
  * 3 - CAN TX (LOW for dominant)
  * 4 - CAN RX (HIGH for recessive)
  * 5 -
  * 6 -
- * 7 - Serial3 RX Broken out
- * 8 - Serial3 TX Broken out
+ * 7 - Serial3 RX Broken out on Header
+ * 8 - Serial3 TX Broken out on Header
  * 9 - SD card detection (shorted to GND when card inserted, floating otherwise)
  * 10- CS/CD (SD Card SPI Slave Select)
  * 11- DOUT  (SD Card SPI Master Input <-- Slave Output) FAT library uses these hardcoded
  * 12- DIN   (SD Card SPI Master Output --> Slave Input) FAT library uses these hardcoded
  * 13- SCK   (SD Card SPI Serial Clock) and Builtin LED  FAT library uses these hardcoded
- * 17    - FM Board Reset Pin
+ * 17    - Physically blocked by SD Card slot
  * 18/A4 - I2C SDA0 (Used to communicate with FM Board)
  * 19/A5 - I2C SCL0 (Used to communicate with FM Board)
+ * 20/A6 - FM Board SEN
+ * 21/A7 - FM Board Reset
  * 23/A9 -IO-1 and CAN Chip Enable Pin (some variants of my CAN board need this)
- * 22/A8 -IO-2 Broken out
- * 21/A7 -IO-3 Broken out
- * 20/A6 -IO-4 Broken out
+ * 22/A8 -IO-2 Broken out on Header
+ * 21/A7 -IO-3 Broken out on Header
+ * 20/A6 -IO-4 Broken out on Header
  */
 #include <Arduino.h>
 #include <usb_rawhid.h> //to communicate with PC or Android
@@ -44,7 +46,7 @@
 #include <SparkFunSi4703.h>
 #include <Wire.h>
 
-int FMresetPin = 17;
+int FMresetPin = 21;
 int SDIO = A4;
 int SCLK = A5;
 
@@ -152,8 +154,8 @@ void setup()
 	radio->status._treble = EEPROM.read(5);
 
 #ifdef _SI4703FM_ENABLED
-	Si4703Radio.powerOn();
-	Si4703Radio.setVolume(0);
+	//Si4703Radio.powerOn();
+	//Si4703Radio.setVolume(15);
 #endif
 }
 
@@ -441,10 +443,19 @@ if(wdtimer->check())
 					Si4703Radio.setVolume(buf[2]);
 					break;
 				case 0x04: //Set channel (next bit is our channel to set can be from 1-102 (USA FM Radio))
+				{
 					////Freq (MHz) = 0.2 x Channel + 87.5 MHz.
 					//Channel 1 = 87.5
 					Si4703Radio.setChannel(buf[2]);
+					//char sendMessage[64] = {}; //declare and init a buffer
+					//sendMessage[0] = 0x03; //total length of this data packet
+					//2nd byte is a command reference
+					//sendMessage[1] = 0x03; //0x03 means this is a FM Radio channel update
+					//sendMessage[2] = buf[2];
+					//send to PC, allow 200ms for sending the frame
+					//RawHID.send(sendMessage, 200);
 					break;
+				}
 				case 0x05: //Read RDS data
 				{
 					char rdsBuffer[10];
@@ -452,7 +463,7 @@ if(wdtimer->check())
 					char sendMessage[64] = {}; //declare and init a buffer
 					sendMessage[0] = 0x0C; //total length of this data packet
 					//2nd byte is a command reference
-					sendMessage[1] = 0x04; //0x03 means this is a FM Radio RDS update
+					sendMessage[1] = 0x04; //0x04 means this is a FM Radio RDS update
 					sendMessage[2] = rdsBuffer[0];
 					sendMessage[3] = rdsBuffer[1];
 					sendMessage[4] = rdsBuffer[2];
@@ -468,8 +479,66 @@ if(wdtimer->check())
 					RawHID.send(sendMessage, 200);
 					break;
 				}
+				case 0x06: //Read RSSI level, stereo status, rds status, channel number
+				{
+					byte rssi=254;
+					byte stereo=254;
+					byte rds=254;
+					byte channel=0;
+					Si4703Radio.getStatus(&rssi, &stereo, &rds,&channel);
+					char sendMessage[64] = {}; //declare and init a buffer
+					sendMessage[0] = 0x06; //total length of this data packet
+					//2nd byte is a command reference
+					sendMessage[1] = 0x06; //0x06 means this is a FM Radio RSSI update
+					sendMessage[2] = rssi;
+					sendMessage[3] = stereo;
+					sendMessage[4] = rds;
+					sendMessage[5] = channel;
+					//send to PC, allow 200ms for sending the frame
+					RawHID.send(sendMessage, 200);
+					if(rds == 1)
+					{
+						char rdsBuffer[10];
+						Si4703Radio.readRDS(rdsBuffer, 1000);
+						char sendMessage[64] = {}; //declare and init a buffer
+						sendMessage[0] = 0x0C; //total length of this data packet
+						//2nd byte is a command reference
+						sendMessage[1] = 0x04; //0x04 means this is a FM Radio RDS update
+						sendMessage[2] = rdsBuffer[0];
+						sendMessage[3] = rdsBuffer[1];
+						sendMessage[4] = rdsBuffer[2];
+						sendMessage[5] = rdsBuffer[3];
+						sendMessage[6] = rdsBuffer[4];
+						sendMessage[7] = rdsBuffer[5];
+						sendMessage[8] = rdsBuffer[6];
+						sendMessage[9] = rdsBuffer[7];
+						sendMessage[10] = rdsBuffer[8];
+						sendMessage[11] = rdsBuffer[9];
 
-
+						//send to PC, allow 200ms for sending the frame
+						RawHID.send(sendMessage, 200);
+					}
+					break;
+				}
+				case 0x07: //Set Radio power on/off (next bit is our on/off flag 0=off 1=on)
+				{
+					if(buf[2] == 0)
+						Si4703Radio.powerOff();
+					if(buf[2] == 1)
+						Si4703Radio.powerOn();
+					break;
+				}
+				case 0x08: //Get Radio power status (next bit is our on/off flag 0=off 1=on)
+				{
+					char sendMessage[64] = {}; //declare and init a buffer
+					sendMessage[0] = 0x03; //total length of this data packet
+					//2nd byte is a command reference
+					sendMessage[1] = 0x05; //0x05 means this is a FM Radio power update
+					sendMessage[2] = Si4703Radio.getPowerStatus();
+					//send to PC, allow 200ms for sending the frame
+					RawHID.send(sendMessage, 200);
+					break;
+				}
 				default:
 					break;
 			}
