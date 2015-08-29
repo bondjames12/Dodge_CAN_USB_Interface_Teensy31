@@ -525,7 +525,10 @@ if(wdtimer->check())
 					if(buf[2] == 0)
 						Si4703Radio.powerOff();
 					if(buf[2] == 1)
+					{
 						Si4703Radio.powerOn();
+						Si4703Radio.setVolume(15);
+					}
 					break;
 				}
 				case 0x08: //Get Radio power status (next bit is our on/off flag 0=off 1=on)
