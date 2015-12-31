@@ -29,7 +29,7 @@
 		<link>
 			<name>Libraries/CAN-Library</name>
 			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/CAN-Library</locationURI>
+			<locationURI>ArduinoPrivateLibPath/CAN-Library</locationURI>
 		</link>
 		<link>
 			<name>Libraries/EEPROM</name>
@@ -42,9 +42,19 @@
 			<locationURI>ArduinoHardwareLibPath/Metro</locationURI>
 		</link>
 		<link>
+			<name>Libraries/SD</name>
+			<type>2</type>
+			<locationURI>ArduinoHardwareLibPath/SD</locationURI>
+		</link>
+		<link>
+			<name>Libraries/SPI</name>
+			<type>2</type>
+			<locationURI>ArduinoHardwareLibPath/SPI</locationURI>
+		</link>
+		<link>
 			<name>Libraries/SparkFun_Si4703_Arduino_Library</name>
 			<type>2</type>
-			<locationURI>ArduinoPivateLibPath/SparkFun_Si4703_Arduino_Library</locationURI>
+			<locationURI>ArduinoPrivateLibPath/SparkFun_Si4703_Arduino_Library</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Wire</name>
@@ -54,21 +64,21 @@
 		<link>
 			<name>arduino/core</name>
 			<type>2</type>
-			<locationURI>ArduinoPlatformPath/cores/teensy3</locationURI>
+			<locationURI>ArduinoPlatformPath/teensy3</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
 			<name>ArduinoHardwareLibPath</name>
-			<value>file:/D:/arduino-1.6.1/hardware/teensy/avr/libraries</value>
+			<value>file:/D:/arduino-1.6.5/hardware/teensy/avr/libraries</value>
 		</variable>
 		<variable>
 			<name>ArduinoPinPath</name>
-			<value>file:/D:/arduino-1.6.1/hardware/teensy/avr/variants</value>
+			<value>file:/D:/arduino-1.6.5/hardware/teensy/avr</value>
 		</variable>
 		<variable>
 			<name>ArduinoPlatformPath</name>
-			<value>file:/D:/arduino-1.6.1/hardware/teensy/avr</value>
+			<value>file:/D:/arduino-1.6.5/hardware/teensy/avr/cores</value>
 		</variable>
 	</variableList>
 </projectDescription>

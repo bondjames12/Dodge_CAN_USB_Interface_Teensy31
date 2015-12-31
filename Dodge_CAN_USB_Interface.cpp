@@ -110,11 +110,11 @@ void setup()
 #endif
 	radio = new RadioEmulator(&CAN, false);
 	radio->status._volume = 10;//EEPROM.read(0);
-	radio->status._balance = EEPROM.read(1);
-	radio->status._fade = EEPROM.read(2);
-	radio->status._bass = EEPROM.read(3);
-	radio->status._mid = EEPROM.read(4);
-	radio->status._treble = EEPROM.read(5);
+	radio->status._balance = 0x0a;//EEPROM.read(1);
+	radio->status._fade =  0x0a;//EEPROM.read(2);
+	radio->status._bass =  0x0a;//EEPROM.read(3);
+	radio->status._mid =  0x0a;//EEPROM.read(4);
+	radio->status._treble =  0x0a;//EEPROM.read(5);
 }
 
 #ifdef _WATCHDOG_ENABLED

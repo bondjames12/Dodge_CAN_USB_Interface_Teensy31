@@ -62,6 +62,7 @@ int CANLogger::Log(CAN_Frame message)
 		Serial.println("CANLogger::Failed to write to log file.");
 		#endif
 	}
+	return (0);
 }
 
 CANLogger::~CANLogger()
