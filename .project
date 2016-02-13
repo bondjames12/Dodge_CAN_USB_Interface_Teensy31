@@ -52,16 +52,6 @@
 			<locationURI>ArduinoHardwareLibPath/SPI</locationURI>
 		</link>
 		<link>
-			<name>Libraries/SparkFun_Si4703_Arduino_Library</name>
-			<type>2</type>
-			<locationURI>ArduinoPrivateLibPath/SparkFun_Si4703_Arduino_Library</locationURI>
-		</link>
-		<link>
-			<name>Libraries/Wire</name>
-			<type>2</type>
-			<locationURI>ArduinoHardwareLibPath/Wire</locationURI>
-		</link>
-		<link>
 			<name>arduino/core</name>
 			<type>2</type>
 			<locationURI>ArduinoPlatformPath/teensy3</locationURI>

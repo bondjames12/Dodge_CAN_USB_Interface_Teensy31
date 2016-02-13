@@ -22,14 +22,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/arduino/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/CAN-Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Metro}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SparkFun_Si4703_Arduino_Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SparkFun_Si4703_Arduino_Library/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/EEPROM}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.204140070" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
@@ -38,14 +34,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/arduino/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/CAN-Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Metro}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SparkFun_Si4703_Arduino_Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SparkFun_Si4703_Arduino_Library/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Wire/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/EEPROM}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.1923728926" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
