@@ -144,7 +144,7 @@ void RadioEmulator::InitEvents()
     //CANBusTicker.begin(isr, 150000);  // blinkLED to run every 0.15 seconds
     CANBusTicker = new Metro(1000);
 
-    ChangeSiriusStation(status._siriusChan, true);
+    //ChangeSiriusStation(status._siriusChan, true);
 
     //ReceivedHostMsg = false;
     statusFlag = false;
@@ -173,7 +173,7 @@ void RadioEmulator::Operate()
         	digitalWrite(13, HIGH);
         else
         	digitalWrite(13, LOW);
-        //SendOnMsg();
+        SendOnMsg();
         SendRadioModeMsg();
         SendEVICMsg();
         SendStereoSettingsMsg();
