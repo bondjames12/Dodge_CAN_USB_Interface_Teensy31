@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="it.baeyens.arduino.core.toolChain.release.1703820977">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="it.baeyens.arduino.core.toolChain.release.1703820977" moduleId="org.eclipse.cdt.core.settings" name="Release">
+		<cconfiguration id="io.sloeber.core.toolChain.release.1553740764">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="io.sloeber.core.toolChain.release.1553740764" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
@@ -12,45 +12,70 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildProperties="" description="" id="it.baeyens.arduino.core.toolChain.release.1703820977" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
-					<folderInfo id="it.baeyens.arduino.core.toolChain.release.1703820977.90304251" name="/" resourcePath="">
-						<toolChain id="it.baeyens.arduino.core.toolChain.release.661081515" name="Arduino Toolchain" superClass="it.baeyens.arduino.core.toolChain.release">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="it.baeyens.arduino.targetplatform.192659522" name="Arduino Target" osList="all" superClass="it.baeyens.arduino.targetplatform"/>
-							<builder buildPath="${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31}/Release" id="it.baeyens.arduino.sketch.builder.1084157393" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Arduino sketch builder" superClass="it.baeyens.arduino.sketch.builder"/>
-							<tool id="it.baeyens.arduino.tool.sketch.compiler.cpp.1089867502" name="Arduino C++ Compiler" superClass="it.baeyens.arduino.tool.sketch.compiler.cpp">
-								<option id="it.baeyens.arduino.compiler.cpp.sketch.option.incpath.1546766964" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.cpp.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/arduino/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/CAN-Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Metro}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/EEPROM}&quot;"/>
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="io.sloeber.core.toolChain.release.1553740764" name="Release" optionalBuildProperties="" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="io.sloeber.core.toolChain.release.1553740764.452436040" name="/" resourcePath="">
+						<toolChain id="io.sloeber.core.toolChain.release.2135712396" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.1936391441" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
+							<builder buildPath="${workspace_loc:/Dodge_CAN_USB_Interface_Teensy}/Release" id="io.sloeber.sketch.builder.1298374577" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Arduino sketch builder" superClass="io.sloeber.sketch.builder"/>
+							<tool id="io.sloeber.tool.sketch.compiler.cpp.201270591" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.1890569514" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Wire/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SD}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/CAN-Library}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Metro}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TEA5767-master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TEA5767-FM-Radio-with-Arduino}&quot;"/>
 								</option>
-								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.204140070" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
+								<inputType id="io.sloeber.compiler.cpp.sketch.input.1301222765" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
-							<tool id="it.baeyens.arduino.tool.compiler.c.554097228" name="Arduino C Compiler" superClass="it.baeyens.arduino.tool.compiler.c">
-								<option id="it.baeyens.arduino.compiler.c.sketch.option.incpath.1021408904" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.c.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/arduino/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/CAN-Library}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/Metro}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SD/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/SPI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/Libraries/EEPROM}&quot;"/>
+							<tool id="io.sloeber.tool.compiler.c.1642190289" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.1465356310" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Wire/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SD}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/CAN-Library}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Metro}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TEA5767-master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TEA5767-FM-Radio-with-Arduino}&quot;"/>
 								</option>
-								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.1923728926" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
+								<inputType id="io.sloeber.compiler.c.sketch.input.1360915939" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
-							<tool id="it.baeyens.arduino.tool.ar.316091590" name="Arduino archiver" superClass="it.baeyens.arduino.tool.ar"/>
-							<tool id="it.baeyens.arduino.tool.combine.2050294115" name="Arduino combiner" superClass="it.baeyens.arduino.tool.combine"/>
-							<tool id="it.baeyens.arduino.tool.objcopy.eep.1759498638" name="Arduino tool Create eeprom" superClass="it.baeyens.arduino.tool.objcopy.eep"/>
-							<tool id="it.baeyens.arduino.tool.objcopy.flash.1267485104" name="Arduino tool Create hex" superClass="it.baeyens.arduino.tool.objcopy.flash"/>
-							<tool id="it.baeyens.arduino.tool.size.1981800058" name="Arduino tool Print Size" superClass="it.baeyens.arduino.tool.size"/>
-							<tool id="it.baeyens.arduino.tool.sketch.compiler.s.375060165" name="Arduino Assembler" superClass="it.baeyens.arduino.tool.sketch.compiler.s"/>
+							<tool id="io.sloeber.tool.sketch.compiler.s.1637567634" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.89198542" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Wire/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SPI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SD/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/SD}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/CAN-Library}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/Metro}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TEA5767-master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Dodge_CAN_USB_Interface_Teensy31/libraries/TEA5767-FM-Radio-with-Arduino}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.S.sketch.input.20320306" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.ar.319726423" name="Arduino archiver" superClass="io.sloeber.tool.ar"/>
+							<tool id="io.sloeber.tool.combine.1439044096" name="Arduino combiner" superClass="io.sloeber.tool.combine"/>
+							<tool id="io.sloeber.tool.objcopy.eep.2090193849" name="Arduino tool objcopy command" superClass="io.sloeber.tool.objcopy.eep"/>
+							<tool id="io.sloeber.tool.size.1759303337" name="Arduino tool Print Size" superClass="io.sloeber.tool.size"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Hardware_Documentation|Libraries/*/?xamples" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="libraries/TimerOne/docs|libraries/TimerOne/config|libraries/TEA5767-FM-Radio-with-Arduino/TEA5767_Master_Library|libraries/TEA5767-FM-Radio-with-Arduino/.git|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -58,17 +83,17 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="Dodge_CAN_USB_Interface_Teensy31.null.1066832125" name="Dodge_CAN_USB_Interface_Teensy31"/>
+		<project id="Dodge_CAN_USB_Interface_Teensy.null.555694275" name="Dodge_CAN_USB_Interface_Teensy"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/Dodge_CAN_USB_Interface_Teensy31"/>
+			<resource resourceType="PROJECT" workspacePath="/Dodge_CAN_USB_Interface_Teensy"/>
 		</configuration>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

@@ -42,17 +42,26 @@ void setup();
 #endif
 
 //add your function definitions for the project Dodge_CAN_USB_Interface_Teensy31 here
+#ifdef _DEBUG_ENABLED
+void PrintBuffer(char *msg, byte *buf);
+#endif
 void readCANMessage();
 void sendCANMessage();
-void printCANMessage(CAN_Frame msg);
+void printCANMessage(bool direction,CAN_Frame msg);
 void printCANMessageUSBHID(CAN_Frame message);
 void SendUSBAmpUpdate();
+void SendUSBTeensyUpdate();
+void SendUSBFMData(uint8_t cmd, uint8_t arg1,  uint8_t arg2);
+void SendUSBFMData(uint8_t cmd, uint8_t arg1,  uint8_t arg2,uint8_t arg3);
+void SendUSBFMData(uint8_t cmd, uint8_t arg1,  uint8_t arg2,uint8_t arg3,uint8_t arg4);
 void SaveVolumeEEPROM();
 void SaveBalanceEEPROM();
 void SaveFadeEEPROM();
 void SaveBassEEPROM();
 void SaveMidEEPROM();
 void SaveTrebleEEPROM();
+void PreAMPAUXOn();
+void PreAMPAUXOff();
 
 //Do not add code below this line
 #endif /* _Dodge_CAN_USB_Interface_Teensy31_H_ */

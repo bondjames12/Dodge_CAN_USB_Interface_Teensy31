@@ -8,8 +8,18 @@
 #include <sn65hvd234.h>
 #include "Dodge_CAN_USB_Interface.h"
 #include "radioEmulator.h"
+#include <TEA5767N.h>
 //#include <CAN_SAM3X.h>
+#include "ClickEncoder.h"
+#include <TimerOne.h>
 
+//Used to access a float as a byte array for use in USB communication
+union {
+    float fval;
+    byte bval[4];
+} floatAsBytes;
+
+#define _DEBUG_ENABLED
 #define _WATCHDOG_ENABLED //Enable watchdog timer code complilation
 // Define our CAN speed (bitrate).
 #define bitrate CAN_BPS_83K//CAN_BPS_500K
@@ -20,10 +30,29 @@ Metro* wdtimer = new Metro(500); //schedule a timer to kick the watchdog
 #endif
 RadioEmulator *radio;
 //Metro* usbUpdateTimer = new Metro(500); //schedule a timer to send updates over USB
+//FM Radio control
+TEA5767N *fmRadio;
 
 // data counter just to show a dynamic change in data messages
 uint32_t standard_counter = 0;
 const int ledPin = 13;
+const int powerStatusPin = 6;
+uint8_t powerStatus = 0;
+
+//USB HID Buffer
+uint8_t usbmsg[64] = {};
+
+//Rotary encoders
+ClickEncoder *rightEncoder;
+ClickEncoder *leftEncoder;
+int16_t last, value;
+int16_t last2, value2;
+
+//Interrupt used to measure encoder positions
+void timerIsr() {
+  rightEncoder->service();
+  leftEncoder->service();
+}
 
 #ifdef _WATCHDOG_ENABLED
 #ifdef __cplusplus
@@ -68,14 +97,37 @@ void WatchdogKick()
 }
 #endif
 
+#ifdef _DEBUG_ENABLED
+void PrintBuffer(char *msg)
+{
+	//print everything we get from USB to serial port
+	Serial1.print(msg);
+	for (byte i = 0; i < 11; i++)
+	{
+		Serial1.print(usbmsg[i] < 16 ? "0" : ""); //print leading HEX 0 if needed
+		Serial1.print(usbmsg[i], HEX);
+		Serial1.print(" ");
+	}
+	Serial1.println("");
+}
+#endif
+
 void setup()
 {
 	pinMode(ledPin, OUTPUT); //led
-	pinMode( 23, OUTPUT ) ; //CAN Chip Enable Pin
-	digitalWrite(23, HIGH ) ; //Set CAN ENable to high (turns chip on)
+	pinMode( A9, OUTPUT ) ; //CAN Chip Enable Pin
+	digitalWrite(A9, HIGH ) ; //Set CAN ENable to high (turns chip on)
+	pinMode(A8, INPUT_PULLUP);
 	delay(100);
+	powerStatus = digitalRead(powerStatusPin);
 
-	//Serial.begin(115200); // Initialize Serial communications with computer to use serial monitor
+#ifdef _DEBUG_ENABLED
+//Change to alternate PINS for RX1/TX1 (pin# 5 and 21)
+Serial1.setRX(21);
+Serial1.setTX(5);
+Serial1.begin(9600); // Initialize Serial communications with computer to use serial monitor
+Serial1.print("Welcome to Teensy Dodge Interface.");
+#endif
 	//Set CAN speed.
 	CAN.begin(bitrate);
 	CAN_Filter filter_3A0;//STEER CONTROLS
@@ -115,20 +167,40 @@ void setup()
 	radio->status._bass =  0x0a;//EEPROM.read(3);
 	radio->status._mid =  0x0a;//EEPROM.read(4);
 	radio->status._treble =  0x0a;//EEPROM.read(5);
+
+	fmRadio = new TEA5767N();
+	fmRadio->setSoftMuteOn();
+	fmRadio->setHighCutControlOn();
+	fmRadio->setSearchHighStopLevel();
+	fmRadio->selectFrequency(96.5);
+
+	//Sub Amp audio source selector (USB audio or AUX(FM Radio))
+	pinMode(20, OUTPUT);
+	digitalWrite(20, LOW); //Default to USB audio
+
+	//Setup rotary encoder interrupt and variables
+	rightEncoder = new ClickEncoder(0, 1, 8);
+	leftEncoder = new ClickEncoder(22, 23, 7);
+	Timer1.initialize(1000);
+	Timer1.attachInterrupt(timerIsr);
+	last = -1;
+	last2 = -1;
 }
 
 #ifdef _WATCHDOG_ENABLED
 void printResetType() {
-    if (RCM_SRS1 & RCM_SRS1_SACKERR)   Serial.println("[RCM_SRS1] - Stop Mode Acknowledge Error Reset");
-    if (RCM_SRS1 & RCM_SRS1_MDM_AP)    Serial.println("[RCM_SRS1] - MDM-AP Reset");
-    if (RCM_SRS1 & RCM_SRS1_SW)        Serial.println("[RCM_SRS1] - Software Reset");
-    if (RCM_SRS1 & RCM_SRS1_LOCKUP)    Serial.println("[RCM_SRS1] - Core Lockup Event Reset");
-    if (RCM_SRS0 & RCM_SRS0_POR)       Serial.println("[RCM_SRS0] - Power-on Reset");
-    if (RCM_SRS0 & RCM_SRS0_PIN)       Serial.println("[RCM_SRS0] - External Pin Reset");
-    if (RCM_SRS0 & RCM_SRS0_WDOG)      Serial.println("[RCM_SRS0] - Watchdog(COP) Reset");
-    if (RCM_SRS0 & RCM_SRS0_LOC)       Serial.println("[RCM_SRS0] - Loss of External Clock Reset");
-    if (RCM_SRS0 & RCM_SRS0_LOL)       Serial.println("[RCM_SRS0] - Loss of Lock in PLL Reset");
-    if (RCM_SRS0 & RCM_SRS0_LVD)       Serial.println("[RCM_SRS0] - Low-voltage Detect Reset");
+	#ifdef _DEBUG_ENABLED
+    if (RCM_SRS1 & RCM_SRS1_SACKERR)   Serial1.println("[RCM_SRS1] - Stop Mode Acknowledge Error Reset");
+    if (RCM_SRS1 & RCM_SRS1_MDM_AP)    Serial1.println("[RCM_SRS1] - MDM-AP Reset");
+    if (RCM_SRS1 & RCM_SRS1_SW)        Serial1.println("[RCM_SRS1] - Software Reset");
+    if (RCM_SRS1 & RCM_SRS1_LOCKUP)    Serial1.println("[RCM_SRS1] - Core Lockup Event Reset");
+    if (RCM_SRS0 & RCM_SRS0_POR)       Serial1.println("[RCM_SRS0] - Power-on Reset");
+    if (RCM_SRS0 & RCM_SRS0_PIN)       Serial1.println("[RCM_SRS0] - External Pin Reset");
+    if (RCM_SRS0 & RCM_SRS0_WDOG)      Serial1.println("[RCM_SRS0] - Watchdog(COP) Reset");
+    if (RCM_SRS0 & RCM_SRS0_LOC)       Serial1.println("[RCM_SRS0] - Loss of External Clock Reset");
+    if (RCM_SRS0 & RCM_SRS0_LOL)       Serial1.println("[RCM_SRS0] - Loss of Lock in PLL Reset");
+    if (RCM_SRS0 & RCM_SRS0_LVD)       Serial1.println("[RCM_SRS0] - Low-voltage Detect Reset");
+    #endif
 }
 #endif
 
@@ -158,7 +230,9 @@ void sendCANMessage()
 
   CAN.write(standard_message); // Load message and send
   standard_counter++; // increase count
-  //printMessage(standard_message); //print what we sent to serial port for testing
+#ifdef _DEBUG_ENABLED
+printCANMessage(false,standard_message); //send message to serial debug port
+#endif
 }
 
 // Create a function to read message and display it through Serial Monitor
@@ -167,62 +241,66 @@ void readCANMessage()
 
 }
 
-void printCANMessage(CAN_Frame message)
+void printCANMessage(bool CANRecievedDirection, CAN_Frame message)
 {
-	//Serial.print(millis());
-	//Serial.print(F(",0x"));
-	Serial.print(message.id, HEX); //display message ID
-	Serial.print(' ');
-	//Serial.print(message.rtr); //display message RTR
-	//Serial.print(',');
-	//Serial.print(message.extended); //display message EID
-	//Serial.print(',');
+	if(CANRecievedDirection = true)
+		Serial1.print("RXCAN:");
+	else
+		Serial1.print("TXCAN:");
+	//Serial1.print(millis());
+	//Serial1.print(F(",0x"));
+	Serial1.print(message.id, HEX); //display message ID
+	Serial1.print(' ');
+	//Serial1.print(message.rtr); //display message RTR
+	//Serial1.print(',');
+	//Serial1.print(message.extended); //display message EID
+	//Serial1.print(',');
 	//if (message.rtr == 1)
 	//{
-	//  Serial.print(F(" REMOTE REQUEST MESSAGE ")); //technically if its RTR frame/message it will not have data So display this
+	//  Serial1.print(F(" REMOTE REQUEST MESSAGE ")); //technically if its RTR frame/message it will not have data So display this
 	//}
 	//else
 	//{
-	  Serial.print(message.length, HEX); //display message length
+	  Serial1.print(message.length, HEX); //display message length
 	  for (byte i = 0; i < message.length; i++)
 	  {
-		Serial.print(' ');
+		Serial1.print(' ');
 		if (message.data[i] < 0x10) // If the data is less than 10 hex it will assign a zero to the front as leading zeros are ignored...
 		{
-		  Serial.print('0');
+		  Serial1.print('0');
 		}
-		Serial.print(message.data[i], HEX); //display data based on length
+		Serial1.print(message.data[i], HEX); //display data based on length
 	  }
 	//}
-  Serial.println(); // adds a line
+  Serial1.println(); // adds a line
 }
 
 void printCANMessageUSBHID(CAN_Frame message)
 {
-	uint8_t sendMessage[64] = {}; //buffer
-	sendMessage[0] = message.length + 5; //Total length of this data packet
+	memset(usbmsg,0,sizeof(usbmsg));
+	usbmsg[0] = message.length + 5; //Total length of this data packet
 	//2nd byte is a command reference
-	sendMessage[1] = 0x01; //0x01 means this is a received CAN frame
+	usbmsg[1] = 0x01; //USBRECEIVE_CAN 0x01 means this is a received CAN frame
 	//Message ID (11bits total stored over 2 bytes)
-	sendMessage[2] = (message.id >> 8);
-	sendMessage[3] = (message.id & 0xFF);
+	usbmsg[2] = (message.id >> 8);
+	usbmsg[3] = (message.id & 0xFF);
 	//The CAN frame data length
-	sendMessage[4] = (message.length);
+	usbmsg[4] = (message.length);
 	//Now fill in data bytes
 	for (byte i = 0; i < message.length; i++)
 	{
-		sendMessage[i+5] = message.data[i];
+		usbmsg[i+5] = message.data[i];
 	}
 	//send to PC, allow 100ms for sending the frame
-	RawHID.send(sendMessage, 200);
+	RawHID.send(usbmsg, 200);
 }
 
 void SendHID(String text)
 {
-  uint8_t sendMessage[64] = {}; //buffer
-  text.getBytes(sendMessage,text.length()+1); //convert text to bytes
-//send to PC, allow 100ms for sending the frame
-  RawHID.send(sendMessage, 200);
+	memset(usbmsg,0,sizeof(usbmsg));
+	text.getBytes(usbmsg,text.length()+1); //convert text to bytes
+	//send to PC, allow 100ms for sending the frame
+	RawHID.send(usbmsg, 200);
 }
 
 void loop()
@@ -232,6 +310,74 @@ void loop()
 if(wdtimer->check())
 		WatchdogKick();
 #endif
+/*
+#ifdef _DEBUG_ENABLED
+if (Serial1.available()>0) {
+    int inByte = Serial1.read();
+    if (inByte == '+'){
+    	fmRadio->setSearchUp();
+    	fmRadio->searchNextMuting();
+    	Serial1.println();
+		Serial1.print(fmRadio->readFrequencyInMHz());
+		if (fmRadio->isStereo())
+			Serial1.print(" Stereo ");
+		else
+			Serial1.print(" Mono ");
+		Serial1.print(fmRadio->getSignalLevel()*10);
+    }
+    if (inByte == '-'){
+    	fmRadio->setSearchDown();
+    	fmRadio->searchNextMuting();
+    	Serial1.println();
+		Serial1.print(fmRadio->readFrequencyInMHz());
+		if (fmRadio->isStereo())
+			Serial1.print(" Stereo ");
+		else
+			Serial1.print(" Mono ");
+		Serial1.print(fmRadio->getSignalLevel()*10);
+    }
+    if (inByte == 'm')
+        fmRadio->mute();
+    if (inByte == 'u')
+            fmRadio->turnTheSoundBackOn();
+    if (inByte == 'r'){
+        if(digitalRead(20) == HIGH)
+          digitalWrite(20, LOW);
+         else
+          digitalWrite(20, HIGH);
+    }
+    if (inByte == 'a')
+            fmRadio->setStereoNoiseCancellingOn();
+    if (inByte == 's')
+            fmRadio->setStereoNoiseCancellingOff();
+    if (inByte == 'z')
+                fmRadio->setStereoReception();
+        if (inByte == 'x')
+                fmRadio->setMonoReception();
+    if (inByte == 'd'){
+    	//Run FM Radio process loop
+    	Serial1.println();
+    	Serial1.print(fmRadio->readFrequencyInMHz());
+		if (fmRadio->isStereo())
+			Serial1.print(" Stereo ");
+		else
+			Serial1.print(" Mono ");
+		Serial1.print(fmRadio->getSignalLevel()*10);
+    }
+}
+#endif
+
+
+	//Check status of powerStatusPin (switched from supply power to monitor when external power is about to turn off
+	if (powerStatus != digitalRead(powerStatusPin)) //If pin state has changed
+	{
+		powerStatus = digitalRead(powerStatusPin); //save new pinstate
+		SendUSBTeensyUpdate(); //send this new pin state to android over USB
+	}
+
+//	{ // powerStatusPin  is high due to pullup resistor (supply power will go off in about 5 secs this happens)
+//	} else { // powerStatusPin is low due to supply power being on
+//	}
 
 	CAN_Frame message; // Create message object to use CAN message structure
 	message.valid = false; //init to false
@@ -239,7 +385,9 @@ if(wdtimer->check())
 	{
 		message = CAN.read(); //read message, it will follow the CAN structure of ID,RTR, legnth, data. Allows both Extended or Standard
 		printCANMessageUSBHID(message);
-		//printMessage(message);
+		#ifdef _DEBUG_ENABLED
+		printCANMessage(true,message); //send message to serial debug port
+		#endif
 	}
 
 	//Run radio emulator will send out any CAN messages if needed and parse any message we got above
@@ -253,24 +401,103 @@ if(wdtimer->check())
 			SendUSBAmpUpdate();
 		}
 	}
+*/
 
-	//look for anything we received over USB HID
+	//Calculate rotary encoder positions---------------------------------------------------------------------
+	value += rightEncoder->getValue();
+	value2 += leftEncoder->getValue();
+	if (value > last) {
+		fmRadio->selectFrequency(fmRadio->readFrequencyInMHz() + (abs(value-last) * 0.2));
+		SendUSBFMData(0x06,(uint8_t)fmRadio->getSignalLevel()*10,(uint8_t)fmRadio->isStereo(),0,(uint8_t)round(((fmRadio->readFrequencyInMHz() - 87.5)/0.2)));
+	    Serial1.print((value-last));
+	    last = value;
+	    Serial1.print(" RightEncoder Value: ");
+	    Serial1.println(value);
+	} else if (value < last) {
+		fmRadio->selectFrequency(fmRadio->readFrequencyInMHz() - (abs(value-last) * 0.2));
+		SendUSBFMData(0x06,(uint8_t)fmRadio->getSignalLevel()*10,(uint8_t)fmRadio->isStereo(),0,(uint8_t)round(((fmRadio->readFrequencyInMHz() - 87.5)/0.2)));
+	    Serial1.print((value-last));
+	    last = value;
+	    Serial1.print(" RightEncoder Value: ");
+	    Serial1.println(value);
+	}
+
+	if (value2 > last2) {
+		SendUSBFMData(0x08,abs(value2-last2),0);
+		Serial1.print((value2-last2));
+		last2 = value2;
+		Serial1.print(" LeftEncoder Value: ");
+		Serial1.println(value2);
+	} else if (value2 < last2) {
+		SendUSBFMData(0x08,abs(value2-last2)*-1,0);
+		Serial1.print((value2-last2));
+	    last2 = value2;
+	    Serial1.print(" LeftEncoder Value: ");
+	    Serial1.println(value2);
+	}
+
+	ClickEncoder::Button a = rightEncoder->getButton();
+	if (a != ClickEncoder::Open) {
+	Serial1.print("Button A: ");
+	#define VERBOSECASE(label) case label: Serial1.println(#label); break;
+	switch (a) {
+		VERBOSECASE(ClickEncoder::Pressed);
+		VERBOSECASE(ClickEncoder::Held)
+		VERBOSECASE(ClickEncoder::Released)
+		case ClickEncoder::Clicked:
+			Serial1.println("ClickEncoder::Clicked");
+		break;
+		case ClickEncoder::DoubleClicked:
+			Serial1.println("ClickEncoder::DoubleClicked");
+			rightEncoder->setAccelerationEnabled(!rightEncoder->getAccelerationEnabled());
+			Serial1.print("  Acceleration is ");
+			Serial1.println((rightEncoder->getAccelerationEnabled()) ? "enabled" : "disabled");
+		break;
+	}
+	}
+
+	ClickEncoder::Button b = leftEncoder->getButton();
+	if (b != ClickEncoder::Open) {
+	Serial1.print("Button B: ");
+	#define VERBOSECASE(label) case label: Serial1.println(#label); break;
+	switch (b) {
+		VERBOSECASE(ClickEncoder::Pressed);
+		VERBOSECASE(ClickEncoder::Held)
+		VERBOSECASE(ClickEncoder::Released)
+		case ClickEncoder::Clicked: //mute/unmute
+			Serial1.println("ClickEncoder::Clicked");
+			if(fmRadio->isMuted())
+			{
+				SendUSBFMData(0x08,0,0);
+				fmRadio->turnTheSoundBackOn();
+				PreAMPAUXOn();
+			} else {
+				SendUSBFMData(0x08,0,1);
+				fmRadio->mute();
+				PreAMPAUXOff();
+			}
+		break;
+		case ClickEncoder::DoubleClicked:
+			Serial1.println("ClickEncoder::DoubleClicked");
+			leftEncoder->setAccelerationEnabled(!leftEncoder->getAccelerationEnabled());
+			Serial1.print("  Acceleration is ");
+			Serial1.println((leftEncoder->getAccelerationEnabled()) ? "enabled" : "disabled");
+		break;
+	}
+	}
+
+	//USB HID------------------------------------------------------------------------
 	int bytesAvaliable = RawHID.available();
 	if(bytesAvaliable > 0) //we got something over USB!
 	{
-		//get the bytes
-		uint8_t buf[64];
-		RawHID.recv(buf,100);
-/*
-		//print everything to serial and back to usb
-		for (byte i = 0; i < 64; i++)
-		{
-			Serial.print(buf[i]);
-			RawHID.send(buf,100);
-		}
-*/
+		memset(usbmsg,0,sizeof(usbmsg));
+		RawHID.recv(usbmsg,100);
+
+		#ifdef _DEBUG_ENABLED
+		PrintBuffer("RXUSB:");
+		#endif
 		//1st byte is a command reference a 0x01 is a CAN FRAME
-		switch(buf[0])
+		switch(usbmsg[0])
 		{
 		case 0x01: //Send CAN Frame Command
 			//2nd byte and 3rd byte are the CAN ID
@@ -278,17 +505,17 @@ if(wdtimer->check())
 			//4th - 12 are CAN data bytes
 			CAN_Frame msg; // Create message object to use CAN message structure
 			//these 2 lines below combine 2 8bit variables into one 16bit variable (although only 11 bits are used for CAN IDs)
-			msg.id = (buf[1]<<8); //shift first byte left 8 bits
-			msg.id = (msg.id | buf[2]); //OR in 2nd byte into right 8 bits
+			msg.id = (usbmsg[1]<<8); //shift first byte left 8 bits
+			msg.id = (msg.id | usbmsg[2]); //OR in 2nd byte into right 8 bits
 			msg.valid = true;
 			msg.rtr = 0;
 			msg.extended = CAN_STANDARD_FRAME;
-			msg.length = buf[3]; // Data length
+			msg.length = usbmsg[3]; // Data length
 			// Load the data directly into CAN_Frame
 			//Now fill in data bytes
 			for (byte i = 0; i < msg.length; i++)
 			{
-				msg.data[i] = buf[i+4];
+				msg.data[i] = usbmsg[i+4];
 			}
 			CAN.write(msg); // Load message and send
 			break;
@@ -297,71 +524,71 @@ if(wdtimer->check())
 			break;
 		case 0x03: //Volume increment
 				//first byte is signed increment value
-				radio->VolumeIncrement((int8_t)buf[1]);
+				radio->VolumeIncrement((int8_t)usbmsg[1]);
 				SendUSBAmpUpdate();
 				//SaveVolumeEEPROM();
 			break;
 		case 0x04: //Balance increment
 				//first byte is signed increment value
-				radio->BalanceIncrement((int8_t)buf[1]);
+				radio->BalanceIncrement((int8_t)usbmsg[1]);
 				SendUSBAmpUpdate();
 				SaveBalanceEEPROM();
 			break;
 		case 0x05: //Fade increment
 				//first byte is signed increment value
-				radio->FadeIncrement((int8_t)buf[1]);
+				radio->FadeIncrement((int8_t)usbmsg[1]);
 				SendUSBAmpUpdate();
 				SaveFadeEEPROM();
 			break;
 		case 0x06: //Bass increment
 				//first byte is signed increment value
-				radio->BassIncrement((int8_t)buf[1]);
+				radio->BassIncrement((int8_t)usbmsg[1]);
 				SendUSBAmpUpdate();
 				SaveBassEEPROM();
 			break;
 		case 0x07: //Mid increment
 				//first byte is signed increment value
-				radio->MidIncrement((int8_t)buf[1]);
+				radio->MidIncrement((int8_t)usbmsg[1]);
 				SendUSBAmpUpdate();
 				SaveMidEEPROM();
 			break;
 		case 0x08: //Treble increment
 				//first byte is signed increment value
-				radio->TrebleIncrement((int8_t)buf[1]);
+				radio->TrebleIncrement((int8_t)usbmsg[1]);
 				SendUSBAmpUpdate();
 				SaveTrebleEEPROM();
 			break;
 		case 0x09: //Set amp parameter
 				//first byte is parameter code
-				switch(buf[1])
-				{   //buf[2] is the parameter value
+				switch(usbmsg[1])
+				{   //usbmsg[2] is the parameter value
 					case 0x03: //Volume
-							radio->VolumeSet(buf[2]);
+							radio->VolumeSet(usbmsg[2]);
 							SendUSBAmpUpdate();
 							SaveVolumeEEPROM();
 						break;
 					case 0x04: //Balance
-							radio->BalanceSet(buf[2]);
+							radio->BalanceSet(usbmsg[2]);
 							SendUSBAmpUpdate();
 							SaveBalanceEEPROM();
 						break;
 					case 0x05: //Fade
-							radio->FadeSet(buf[2]);
+							radio->FadeSet(usbmsg[2]);
 							SendUSBAmpUpdate();
 							SaveFadeEEPROM();
 						break;
 					case 0x06: //Bass
-							radio->BassSet(buf[2]);
+							radio->BassSet(usbmsg[2]);
 							SendUSBAmpUpdate();
 							SaveBassEEPROM();
 						break;
 					case 0x07: //Mid
-							radio->MidSet(buf[2]);
+							radio->MidSet(usbmsg[2]);
 							SendUSBAmpUpdate();
 							SaveMidEEPROM();
 						break;
 					case 0x08: //Treble
-							radio->TrebleSet(buf[2]);
+							radio->TrebleSet(usbmsg[2]);
 							SendUSBAmpUpdate();
 							SaveTrebleEEPROM();
 						break;
@@ -369,7 +596,54 @@ if(wdtimer->check())
 						break;
 				}
 			break;
+		case 0x0A: //FM Radio command
+			//first byte is parameter code
+			switch(usbmsg[1])
+			{
+				case 0x01: //USB_FM_SEEK_UP
+					fmRadio->setSearchMidStopLevel();
+					fmRadio->setSearchUp();
+					fmRadio->searchNextMuting();
+					SendUSBFMData(0x03, (uint8_t)round(((fmRadio->readFrequencyInMHz() - 87.5)/0.2)), 0);
+					break;
+				case 0x02: //USB_FM_SEEK_DOWN
+					fmRadio->setSearchMidStopLevel();
+					fmRadio->setSearchDown();
+					fmRadio->searchNextMuting();
+					SendUSBFMData(0x03, (uint8_t)round(((fmRadio->readFrequencyInMHz() - 87.5)/0.2)), 0);
+					break;
+				case 0x03: //USB_FM_SET_VOLUME
+					break;
+				case 0x04: //USB_FM_SET_CHANNEL
+					Serial1.print((usbmsg[2] * 0.2) + 87.50);
+					fmRadio->selectFrequency((usbmsg[2] * 0.2) + 87.50);
+					SendUSBFMData(0x03, (uint8_t)round(((fmRadio->readFrequencyInMHz() - 87.5)/0.2)), 0);
+					break;
+				case 0x05: //USB_FM_GET_RDS
+					break;
+				case 0x06: //USB_FM_GET_RSSI
+					SendUSBFMData(0x06,(uint8_t)fmRadio->getSignalLevel()*10,(uint8_t)fmRadio->isStereo(),0,(uint8_t)round(((fmRadio->readFrequencyInMHz() - 87.5)/0.2)));
+					break;
+				case 0x07: //USB_FM_SET_POWER
+					switch(usbmsg[2])
+					{
+						case 0x00: //off
+							fmRadio->mute();
+							PreAMPAUXOff();
+						break;
+						case 0x01: //on
+							fmRadio->turnTheSoundBackOn();
+							PreAMPAUXOn();
+						break;
+					}
+					break;
+				case 0x08: //USB_FM_GET_POWER
+					break;
 
+				default:
+					break;
+			}
+		break;
 
 
 		default:
@@ -382,23 +656,88 @@ if(wdtimer->check())
 
 void SendUSBAmpUpdate()
 {
-	uint8_t sendMessage[64] = {}; //declare and init a buffer
-	sendMessage[0] = 0x0A; //total length of this data packet
+	memset(usbmsg,0,sizeof(usbmsg));
+	usbmsg[0] = 0x0A; //total length of this data packet
 	//2nd byte is a command reference
-	sendMessage[1] = 0x02; //0x02 means this is a AMP settings update
-	sendMessage[2] = radio->status._volume;
-	sendMessage[3] = radio->status._balance;
-	sendMessage[4] = radio->status._fade;
-	sendMessage[5] = radio->status._bass;
-	sendMessage[6] = radio->status._mid;
-	sendMessage[7] = radio->status._treble;
-	sendMessage[8] = radio->status._radioMode;
-	sendMessage[9] = radio->status.SWCButtons;
+	usbmsg[1] = 0x02; //USBRECEIVE_AMP 0x02 means this is a AMP settings update
+	usbmsg[2] = radio->status._volume;
+	usbmsg[3] = radio->status._balance;
+	usbmsg[4] = radio->status._fade;
+	usbmsg[5] = radio->status._bass;
+	usbmsg[6] = radio->status._mid;
+	usbmsg[7] = radio->status._treble;
+	usbmsg[8] = radio->status._radioMode;
+	usbmsg[9] = radio->status.SWCButtons;
 
 	//send to PC, allow 200ms for sending the frame
-	RawHID.send(sendMessage, 200);
+	RawHID.send(usbmsg, 200);
+	#ifdef _DEBUG_ENABLED
+	PrintBuffer("TXUSB:");
+	#endif
 }
-//void (*SendUSBAmpUpdateCallbackPointer)() = &SendUSBAmpUpdate;
+
+void SendUSBTeensyUpdate()
+{
+	memset(usbmsg,0,sizeof(usbmsg));
+	usbmsg[0] = 0x03; //total length of this data packet
+	//2nd byte is a command reference
+	usbmsg[1] = 0x07; //USBRECEIVE_TEENSY_STATUS 0x07 means this is a Teensy status update
+	usbmsg[2] = powerStatus;
+
+	//send to PC, allow 200ms for sending the frame
+	RawHID.send(usbmsg, 200);
+	#ifdef _DEBUG_ENABLED
+	PrintBuffer("TXUSB:");
+	#endif
+}
+
+void SendUSBFMData(uint8_t cmd, uint8_t arg1,  uint8_t arg2)
+{
+	memset(usbmsg,0,sizeof(usbmsg));
+	usbmsg[0] = 0x04; //total length of this data packet
+	//2nd byte is a command reference
+	usbmsg[1] = cmd;
+	usbmsg[2] = arg1;
+	usbmsg[3] = arg2;
+	//send to PC, allow 200ms for sending the frame
+	RawHID.send(usbmsg, 200);
+	#ifdef _DEBUG_ENABLED
+	PrintBuffer("TXUSB:");
+	#endif
+}
+
+void SendUSBFMData(uint8_t cmd, uint8_t arg1,  uint8_t arg2,uint8_t arg3)
+{
+	memset(usbmsg,0,sizeof(usbmsg));
+	usbmsg[0] = 0x05; //total length of this data packet
+	//2nd byte is a command reference
+	usbmsg[1] = cmd;
+	usbmsg[2] = arg1;
+	usbmsg[3] = arg2;
+	usbmsg[4] = arg3;
+	//send to PC, allow 200ms for sending the frame
+	RawHID.send(usbmsg, 200);
+	#ifdef _DEBUG_ENABLED
+	PrintBuffer("TXUSB:");
+	#endif
+}
+
+void SendUSBFMData(uint8_t cmd, uint8_t arg1,  uint8_t arg2,uint8_t arg3,uint8_t arg4)
+{
+	memset(usbmsg,0,sizeof(usbmsg));
+	usbmsg[0] = 0x06; //total length of this data packet
+	//2nd byte is a command reference
+	usbmsg[1] = cmd;
+	usbmsg[2] = arg1;
+	usbmsg[3] = arg2;
+	usbmsg[4] = arg3;
+	usbmsg[5] = arg4;
+	//send to PC, allow 200ms for sending the frame
+	RawHID.send(usbmsg, 200);
+	#ifdef _DEBUG_ENABLED
+	PrintBuffer("TXUSB:");
+	#endif
+}
 
 void SaveVolumeEEPROM()
 {
@@ -428,4 +767,14 @@ void SaveMidEEPROM()
 void SaveTrebleEEPROM()
 {
 	EEPROM.write(5, radio->status._treble);
+}
+
+//Turn pre-amp aux audio on (fm radio audio)
+void PreAMPAUXOn(){
+	digitalWrite(20, HIGH);
+}
+
+//Turn pre-amp aux audio off (fm radio audio)
+void PreAMPAUXOff(){
+	digitalWrite(20, LOW);
 }
